@@ -221,9 +221,68 @@ extern int getsockopt (int __fd, int __level, int __optname,
 		       void *__restrict __optval,
 		       socklen_t *__restrict __optlen) __THROW;
 
-/* Set socket FD's option OPTNAME at protocol level LEVEL
-   to *OPTVAL (which is OPTLEN bytes long).
-   Returns 0 on success, -1 for errors.  */
+/* Set socket FD's                  #socket file descriptor  FD
+*  option OPTNAME                   #OPTNAME option's name  选项名
+*                                            选项名称　　　　　　　　说明　　　　　　　　　　　　　　　　　　数据类型
+*                                            ========================================================================
+*                                            　　　　　　　　　　　　SOL_SOCKET
+*                                            ------------------------------------------------------------------------
+*                                           SO_BROADCAST　　　　　　同意发送广播数据　　　　　　　　　　　　int
+*                                            SO_DEBUG　　　　　　　　同意调试　　　　　　　　　　　　　　　　int
+*                                            SO_DONTROUTE　　　　　　不查找路由　　　　　　　　　　　　　　　int
+*                                            SO_ERROR　　　　　　　　获得套接字错误　　　　　　　　　　　　　int
+*                                            SO_KEEPALIVE　　　　　　保持连接　　　　　　　　　　　　　　　　int
+*                                            SO_LINGER　　　　　　　 延迟关闭连接　　　　　　　　　　　　　　struct linger
+*                                            SO_OOBINLINE　　　　　　带外数据放入正常数据流　　　　　　　　　int
+*                                            SO_RCVBUF　　　　　　　 接收缓冲区大小　　　　　　　　　　　　　int
+*                                            SO_SNDBUF　　　　　　　 发送缓冲区大小　　　　　　　　　　　　　int
+*                                            SO_RCVLOWAT　　　　　　 接收缓冲区下限　　　　　　　　　　　　　int   1 byte      / receive low-water mark
+*                                            SO_SNDLOWAT　　　　　　 发送缓冲区下限　　　　　　　　　　　　　int   2048 bytes  // send low-water mark
+*                                                                   SO_SNDBUF https://linux.die.net/man/7/socket
+                                                                    Sets or gets the maximum socket send buffer in bytes.
+                                                                    The kernel doubles this value (to allow space for bookkeeping overhead)
+                                                                    when it is set using setsockopt(2),
+                                                                    and this doubled value is returned by getsockopt(2).
+                                                                    The default value is set by the /proc/sys/net/core/wmem_default file and
+                                                                    the maximum allowed value is set by the /proc/sys/net/core/wmem_max file.
+                                                                    The minimum (doubled) value for this option is 2048.
+*                                            SO_RCVTIMEO　　　　　　 接收超时　　　　　　　　　　　　　　　　struct timeval
+*                                            SO_SNDTIMEO　　　　　　 发送超时　　　　　　　　　　　　　　　　struct timeval
+*                                            SO_REUSERADDR　　　　　 同意重用本地地址和port　　　　　　　　　int
+*                                            SO_TYPE　　　　　　　　 获得套接字类型　　　　　　　　　　　　　int
+*                                            SO_BSDCOMPAT　　　　　　与BSD系统兼容　　　　　　　　　　　　　 int
+*                                            ========================================================================
+*                                            　　　　　　　　　　　　IPPROTO_IP
+*                                            ------------------------------------------------------------------------
+*                                            IP_HDRINCL　　　　　　　在数据包中包括IP首部　　　　　　　　　　int
+*                                            IP_OPTINOS　　　　　　　IP首部选项　　　　　　　　　　　　　　　int
+*                                            IP_TOS　　　　　　　　　服务类型
+*                                            IP_TTL　　　　　　　　　生存时间　　　　　　　　　　　　　　　　int
+*                                            ========================================================================
+*                                            　　　　　　　　　　　　IPPRO_TCP
+*                                            ------------------------------------------------------------------------
+*                                            TCP_MAXSEG　　　　　　　TCP最大数据段的大小　　　　　　　　　　 int
+*                                            TCP_NODELAY　　　　　　 不使用Nagle算法　　　　　　　　　　　　 int
+*                                            ========================================================================
+*
+*  at protocol level LEVEL          #protocol'level 协议层level
+*                                           level指定控制套接字的层次.能够取三种值:
+                                            1)SOL_SOCKET:通用套接字选项.
+                                            2)IPPROTO_IP:IP选项.
+                                            3)IPPROTO_TCP:TCP选项.　
+
+*  to *OPTVAL                       #对于getsockopt()，指向返回选项值的缓冲。对于setsockopt()，指向包括新选项值的缓冲
+*  (which is OPTLEN bytes long).    #对于getsockopt()，作为入口參数时，选项值的最大长度。作为出口參数时，选项值的实际长度。对于setsockopt()，现选项的长度
+
+***********************************************
+*   Returns 0 on success, -1 for errors.
+*成功运行时，返回0。失败返回-1，errno被设为下面的某个值
+*EBADF：sock不是有效的文件描写叙述词
+*EFAULT：optval指向的内存并不是有效的进程空间
+*EINVAL：在调用setsockopt()时，optlen无效
+*ENOPROTOOPT：指定的协议层不能识别选项
+*ENOTSOCK：sock描写叙述的不是套接字
+**/
 extern int setsockopt (int __fd, int __level, int __optname,
 		       const void *__optval, socklen_t __optlen) __THROW;
 
